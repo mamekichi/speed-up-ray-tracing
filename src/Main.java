@@ -18,6 +18,9 @@ public class Main {
 		oct.createTree(3, top, bottom);
 		
 		System.out.println(oct.child2.top.x);
+		System.out.println(oct.child2.child2.top.x);
+		System.out.println(oct.child2.child2.child2.top.x);
+		
 		
 		return;
 	}

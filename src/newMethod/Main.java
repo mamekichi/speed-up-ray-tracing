@@ -6,8 +6,10 @@ import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
-
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 //file
+import java.io.*;
 import java.io.File;
 import java.io.FileReader;
 
@@ -15,18 +17,63 @@ public class Main {
 	public static void main(String[] args) {
 		System.out.println("hello");
 		
+		//read file test
 		try {
 			File file = new File("src/Jmap/6544/654450.MEM");
 			
 			if(file.exists()) {
-				FileReader filereader = new FileReader(file);
+				FileReader nowFilereader = new FileReader(file);
+				FileReader nextFilereader = new FileReader(file);
+				BufferedReader nowbr = new BufferedReader(nowFilereader);
+				BufferedReader nextbr = new BufferedReader(nextFilereader);
 				
-				int data;
-				char ctemp[] = new char[6];
-				while((data = filereader.read(ctemp)) != -1) {
-					System.out.println(ctemp);
+				int i,j;
+				String line;
+				String nowLine;
+				String nextLine;
+				Map nowMap = new Map();
+				Map nextMap = new Map();
+				String nowElevationpart;
+				String nextElevationpart;
+				Matcher nowElevation;
+				Matcher nextElevation;
+				
+				double latitude;
+				double longitude;
+				
+				Coordinate coordinate1 = new Coordinate();
+				Coordinate coordinate2 = new Coordinate();
+				//except header and set nextLine
+				nowbr.readLine();
+				nextbr.readLine();
+				nextbr.readLine();
+				while(((nowLine = nowbr.readLine()) != null) && ((nextLine = nextbr.readLine()) != null)) {
+					System.out.println("---");
+					nowMap.meshcode = Integer.parseInt(nowLine.substring(0, 6));
+					nextMap.meshcode = Integer.parseInt(nextLine.substring(0, 6));
+					nowMap.recordnum = Integer.parseInt(nowLine.substring(6,9));
+					nextMap.recordnum = Integer.parseInt(nextLine.substring(6, 9));
+					nowElevationpart = nowLine.substring(9, 1009);
+					nextElevationpart = nextLine.substring(9, 1009);
+					nowElevation = Pattern.compile("[\\s\\S]{1,5}").matcher(nowElevationpart);
+					nextElevation = Pattern.compile("[\\s\\S]{1,5}").matcher(nextElevationpart);
+					j = 0;
+					while(nowElevation.find() && nextElevation.find()) {
+						nowMap.elevation[j] = Integer.parseInt(nowElevation.group());
+						nextMap.elevation[j] = Integer.parseInt(nextElevation.group());
+						j++;
+					}
+					System.out.println(nowMap.meshcode);
+					System.out.println(nowMap.recordnum);
+					System.out.println(nextMap.meshcode);
+					System.out.println(nextMap.recordnum);
+					for(j = 0; j < 200; j++) {
+						System.out.println(nowMap.elevation[j]);
+						System.out.println(nextMap.elevation[j]);
+					}
 				}
-				filereader.close();
+				nowFilereader.close();
+				nextFilereader.close();
 			}else {
 				System.out.print("no file");
 			}
@@ -50,12 +97,12 @@ public class Main {
 		Coordinate top = new Coordinate();
 		Coordinate bottom = new Coordinate();
 
-		top.x = 0;
-		top.y = 0;
-		top.z = 0;
-		bottom.x = 1024;
-		bottom.y = 1024;
-		bottom.z = 1024;
+		top.longitude = 0;
+		top.latitude = 0;
+		top.elevation = 0;
+		bottom.longitude = 1024;
+		bottom.latitude = 1024;
+		bottom.elevation = 1024;
 
 		oct.createTree(3, top, bottom);
 
@@ -63,12 +110,12 @@ public class Main {
 		oct.insertDB(top,bottom);
 
 		//search
-		top.x = 0;
-		top.y = 0;
-		top.z = 0;
-		bottom.x = 600;
-		bottom.y = 600;
-		bottom.z = 0;
+		top.longitude = 0;
+		top.latitude = 0;
+		top.elevation = 0;
+		bottom.longitude = 600;
+		bottom.latitude = 600;
+		bottom.elevation = 0;
 		List<Integer> list = new ArrayList<>();
 		oct.search(list, top, bottom);
 		System.out.println(list);

@@ -20,9 +20,9 @@ public class Octree {
 
 	public void insertDB(Coordinate t, Coordinate b) {
 		try {
-			if( (t.x > this.top.x && t.x < this.bottom.x) &&
-				(t.y > this.top.y && t.y < this.bottom.y) &&
-				(t.z > this.top.z && t.z < this.bottom.z)) {
+			if( (t.longitude > this.top.longitude && t.longitude < this.bottom.longitude) &&
+				(t.latitude > this.top.latitude && t.latitude < this.bottom.latitude) &&
+				(t.elevation > this.top.elevation && t.elevation < this.bottom.elevation)) {
 				this.child1.insertDB(t, b);
 				this.child2.insertDB(t, b);
 				this.child3.insertDB(t, b);
@@ -40,9 +40,9 @@ public class Octree {
 	//範囲内にあるboxをlistにいれて返す
 	public void search(List<Integer> list, Coordinate t, Coordinate b) {
 		try {
-			if( (this.top.x <= b.x && t.x <= this.bottom.x) &&
-				(this.top.y <= b.y && t.y <= this.bottom.y) &&
-				(this.top.z <= b.z && t.z <= this.bottom.z) ) {
+			if( (this.top.longitude <= b.longitude && t.longitude <= this.bottom.longitude) &&
+				(this.top.latitude <= b.latitude && t.latitude <= this.bottom.latitude) &&
+				(this.top.elevation <= b.elevation && t.elevation <= this.bottom.elevation) ) {
 				this.child1.search(list, t, b);
 				this.child2.search(list, t, b);
 				this.child3.search(list, t, b);
@@ -64,7 +64,7 @@ public class Octree {
 		this.bottom = b;
 
 		if(level == 0) {
-			this.unum = (int)this.top.x;
+			this.unum = (int)this.top.longitude;
 			return;
 		}
 
@@ -85,65 +85,65 @@ public class Octree {
 		//child1
 		topTemp = new Coordinate(t);
 		bottomTemp = new Coordinate(b);
-		bottomTemp.x = (topTemp.x + bottomTemp.x)/2.0;
-		bottomTemp.y = (topTemp.y + bottomTemp.y)/2.0;
-		bottomTemp.z = (topTemp.z + bottomTemp.z)/2.0;
+		bottomTemp.longitude = (topTemp.longitude + bottomTemp.longitude)/2.0;
+		bottomTemp.latitude = (topTemp.latitude + bottomTemp.latitude)/2.0;
+		bottomTemp.elevation = (topTemp.elevation + bottomTemp.elevation)/2.0;
 		child1.createTree(level, topTemp, bottomTemp);
 
 		//child2
 		topTemp = new Coordinate(t);
 		bottomTemp = new Coordinate(b);
-		topTemp.x = (topTemp.x + bottomTemp.x)/2.0;
-		bottomTemp.y = (topTemp.y + bottomTemp.y)/2.0;
-		bottomTemp.z = (topTemp.z + bottomTemp.z)/2.0;
+		topTemp.longitude = (topTemp.longitude + bottomTemp.longitude)/2.0;
+		bottomTemp.latitude = (topTemp.latitude + bottomTemp.latitude)/2.0;
+		bottomTemp.elevation = (topTemp.elevation + bottomTemp.elevation)/2.0;
 		child2.createTree(level, topTemp, bottomTemp);
 
 		//child3
 		topTemp = new Coordinate(t);
 		bottomTemp = new Coordinate(b);
-		topTemp.y = (topTemp.y + bottomTemp.y)/2.0;
-		bottomTemp.x = (topTemp.x + bottomTemp.x)/2.0;
-		bottomTemp.z = (topTemp.z + bottomTemp.z)/2.0;
+		topTemp.latitude = (topTemp.latitude + bottomTemp.latitude)/2.0;
+		bottomTemp.longitude = (topTemp.longitude + bottomTemp.longitude)/2.0;
+		bottomTemp.elevation = (topTemp.elevation + bottomTemp.elevation)/2.0;
 		child3.createTree(level, topTemp, bottomTemp);
 
 		//child4
 		topTemp = new Coordinate(t);
 		bottomTemp = new Coordinate(b);
-		topTemp.x = (topTemp.x + bottomTemp.x)/2.0;
-		topTemp.y = (topTemp.y + bottomTemp.y)/2.0;
-		bottomTemp.z = (topTemp.z + bottomTemp.z)/2.0;
+		topTemp.longitude = (topTemp.longitude + bottomTemp.longitude)/2.0;
+		topTemp.latitude = (topTemp.latitude + bottomTemp.latitude)/2.0;
+		bottomTemp.elevation = (topTemp.elevation + bottomTemp.elevation)/2.0;
 		child4.createTree(level,topTemp, bottomTemp);
 
 		//child5
 		topTemp = new Coordinate(t);
 		bottomTemp = new Coordinate(b);
-		bottomTemp.x = (topTemp.x + bottomTemp.x)/2.0;
-		bottomTemp.y = (topTemp.y + bottomTemp.y)/2.0;
-		topTemp.z = (topTemp.z + bottomTemp.z)/2.0;
+		bottomTemp.longitude = (topTemp.longitude + bottomTemp.longitude)/2.0;
+		bottomTemp.latitude = (topTemp.latitude + bottomTemp.latitude)/2.0;
+		topTemp.elevation = (topTemp.elevation + bottomTemp.elevation)/2.0;
 		child5.createTree(level, topTemp, bottomTemp);
 
 		//child6
 		topTemp = new Coordinate(t);
 		bottomTemp = new Coordinate(b);
-		topTemp.x = (topTemp.x + bottomTemp.x)/2.0;
-		bottomTemp.y = (topTemp.y + bottomTemp.y)/2.0;
-		topTemp.z = (topTemp.z + bottomTemp.z)/2.0;
+		topTemp.longitude = (topTemp.longitude + bottomTemp.longitude)/2.0;
+		bottomTemp.latitude = (topTemp.latitude + bottomTemp.latitude)/2.0;
+		topTemp.elevation = (topTemp.elevation + bottomTemp.elevation)/2.0;
 		child6.createTree(level, topTemp, bottomTemp);
 
 		//child7
 		topTemp = new Coordinate(t);
 		bottomTemp = new Coordinate(b);
-		bottomTemp.x = (topTemp.x + bottomTemp.x)/2.0;
-		topTemp.y = (topTemp.y + bottomTemp.y)/2.0;
-		topTemp.z = (topTemp.z + bottomTemp.z)/2.0;
+		bottomTemp.longitude = (topTemp.longitude + bottomTemp.longitude)/2.0;
+		topTemp.latitude = (topTemp.latitude + bottomTemp.latitude)/2.0;
+		topTemp.elevation = (topTemp.elevation + bottomTemp.elevation)/2.0;
 		child7.createTree(level, topTemp, bottomTemp);
 
 		//child8
 		topTemp = new Coordinate(t);
 		bottomTemp = new Coordinate(b);
-		topTemp.x = (topTemp.x + bottomTemp.x)/2.0;
-		topTemp.y = (topTemp.y + bottomTemp.y)/2.0;
-		topTemp.z = (topTemp.z + bottomTemp.z)/2.0;
+		topTemp.longitude = (topTemp.longitude + bottomTemp.longitude)/2.0;
+		topTemp.latitude = (topTemp.latitude + bottomTemp.latitude)/2.0;
+		topTemp.elevation = (topTemp.elevation + bottomTemp.elevation)/2.0;
 		child8.createTree(level, topTemp, bottomTemp);
 	}
 }

@@ -1,15 +1,39 @@
 package newMethod;
 
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+//file
+import java.io.File;
+import java.io.FileReader;
+
 public class Main {
 	public static void main(String[] args) {
 		System.out.println("hello");
-
+		
+		try {
+			File file = new File("src/Jmap/6544/654450.MEM");
+			
+			if(file.exists()) {
+				FileReader filereader = new FileReader(file);
+				
+				int data;
+				char ctemp[] = new char[6];
+				while((data = filereader.read(ctemp)) != -1) {
+					System.out.println(ctemp);
+				}
+				filereader.close();
+			}else {
+				System.out.print("no file");
+			}
+		}catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 		try {
 			Class.forName("org.sqlite.JDBC");
 

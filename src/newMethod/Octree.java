@@ -1,5 +1,7 @@
 package newMethod;
 
+import java.sql.ResultSet;
+import java.sql.Statement;
 import java.util.List;
 
 public class Octree {
@@ -16,33 +18,67 @@ public class Octree {
 	Octree child7;
 	Octree child8;
 
+	String dbname;
 	int unum;
-
-	public void insertDB(Coordinate t, Coordinate b) {
+	
+	public void getBox(Statement statement, List<String> list) {
 		try {
-			if( (t.longitude > this.top.longitude && t.longitude < this.bottom.longitude) &&
-				(t.latitude > this.top.latitude && t.latitude < this.bottom.latitude) &&
-				(t.elevation > this.top.elevation && t.elevation < this.bottom.elevation)) {
-				this.child1.insertDB(t, b);
-				this.child2.insertDB(t, b);
-				this.child3.insertDB(t, b);
-				this.child4.insertDB(t, b);
-				this.child5.insertDB(t, b);
-				this.child6.insertDB(t, b);
-				this.child7.insertDB(t, b);
-				this.child8.insertDB(t, b);
+			int i;
+			ResultSet results;
+			for(i = 0; i < list.size();i++) {
+			
+				System.out.println(list.get(i));
+				results = statement.executeQuery("select * from "+list.get(i)+";");
+				while(results.next()) {
+					System.out.println(results.getString("top_tatitude"));
+				}
 			}
 		}catch(Exception e) {
-			//add DB
+			System.out.println(e);
+		}
+	}
+
+	public void insertDB(Statement statement, Box box) {
+		try {
+			if( (box.top.longitude > this.top.longitude && box.top.longitude < this.bottom.longitude) &&
+				(box.top.latitude > this.top.latitude && box.top.latitude < this.bottom.latitude) &&
+				(box.top.elevation < this.top.elevation && box.top.elevation > this.bottom.elevation)) {
+				this.child1.insertDB(statement, box);
+				this.child2.insertDB(statement, box);
+				this.child3.insertDB(statement, box);
+				this.child4.insertDB(statement, box);
+				this.child5.insertDB(statement, box);
+				this.child6.insertDB(statement, box);
+				this.child7.insertDB(statement, box);
+				this.child8.insertDB(statement, box);
+			}
+		}catch(Exception e) {
+			/*
+			try {
+				
+				String queValue = String.valueOf(GlobalVariable.gId) + ","+String.valueOf(box.top.longitude) + ","+
+						String.valueOf(box.bottom.longitude) + ","+
+						String.valueOf(box.top.latitude) + ","+
+						String.valueOf(box.bottom.latitude) + ","+
+						String.valueOf(box.bottom.elevation) + ","+
+						String.valueOf(box.top.elevation);				
+				statement.executeUpdate("INSERT INTO "+this.dbname+" VALUES("+queValue+");");
+				GlobalVariable.gId++;
+			}catch(Exception ex) {
+				System.out.println(ex);
+			
+			}
+			*/
+			 //System.out.println(this.dbname);
 		}
 	}
 
 	//範囲内にあるboxをlistにいれて返す
-	public void search(List<Integer> list, Coordinate t, Coordinate b) {
+	public void search(List<String> list, Coordinate t, Coordinate b) {
 		try {
 			if( (this.top.longitude <= b.longitude && t.longitude <= this.bottom.longitude) &&
 				(this.top.latitude <= b.latitude && t.latitude <= this.bottom.latitude) &&
-				(this.top.elevation <= b.elevation && t.elevation <= this.bottom.elevation) ) {
+				(this.top.elevation >= b.elevation && t.elevation >= this.bottom.elevation) ) {
 				this.child1.search(list, t, b);
 				this.child2.search(list, t, b);
 				this.child3.search(list, t, b);
@@ -53,17 +89,25 @@ public class Octree {
 				this.child8.search(list, t, b);
 			}
 		}catch(Exception e){
-			list.add(this.unum);
+			list.add(this.dbname);
 		}
 		return;
 
 	}
 
-	public void createTree(int level, Coordinate t, Coordinate b) {
-		this.top = t;
-		this.bottom = b;
+	public void createTree(Statement statement, int level, Coordinate t, Coordinate b) {
+		this.top = new Coordinate(t);
+		this.bottom = new Coordinate(b);
 
 		if(level == 0) {
+			this.dbname = "db" + String.valueOf((int)this.top.longitude) + String.valueOf((int)this.top.latitude) + String.valueOf((int)this.top.elevation);
+			
+			try {
+				statement.executeQuery("create virtual table " + this.dbname + " USING rtree(id,bottom_longitude,top_longitude,bottom_latitude,top_tatitude,bottom_elevation,top_elevation);");
+			}catch(Exception e) {
+				//System.out.println(e);
+			}
+			
 			this.unum = (int)this.top.longitude;
 			return;
 		}
@@ -88,7 +132,7 @@ public class Octree {
 		bottomTemp.longitude = (topTemp.longitude + bottomTemp.longitude)/2.0;
 		bottomTemp.latitude = (topTemp.latitude + bottomTemp.latitude)/2.0;
 		bottomTemp.elevation = (topTemp.elevation + bottomTemp.elevation)/2.0;
-		child1.createTree(level, topTemp, bottomTemp);
+		child1.createTree(statement, level, topTemp, bottomTemp);
 
 		//child2
 		topTemp = new Coordinate(t);
@@ -96,7 +140,7 @@ public class Octree {
 		topTemp.longitude = (topTemp.longitude + bottomTemp.longitude)/2.0;
 		bottomTemp.latitude = (topTemp.latitude + bottomTemp.latitude)/2.0;
 		bottomTemp.elevation = (topTemp.elevation + bottomTemp.elevation)/2.0;
-		child2.createTree(level, topTemp, bottomTemp);
+		child2.createTree(statement, level, topTemp, bottomTemp);
 
 		//child3
 		topTemp = new Coordinate(t);
@@ -104,7 +148,7 @@ public class Octree {
 		topTemp.latitude = (topTemp.latitude + bottomTemp.latitude)/2.0;
 		bottomTemp.longitude = (topTemp.longitude + bottomTemp.longitude)/2.0;
 		bottomTemp.elevation = (topTemp.elevation + bottomTemp.elevation)/2.0;
-		child3.createTree(level, topTemp, bottomTemp);
+		child3.createTree(statement, level, topTemp, bottomTemp);
 
 		//child4
 		topTemp = new Coordinate(t);
@@ -112,7 +156,7 @@ public class Octree {
 		topTemp.longitude = (topTemp.longitude + bottomTemp.longitude)/2.0;
 		topTemp.latitude = (topTemp.latitude + bottomTemp.latitude)/2.0;
 		bottomTemp.elevation = (topTemp.elevation + bottomTemp.elevation)/2.0;
-		child4.createTree(level,topTemp, bottomTemp);
+		child4.createTree(statement, level,topTemp, bottomTemp);
 
 		//child5
 		topTemp = new Coordinate(t);
@@ -120,7 +164,7 @@ public class Octree {
 		bottomTemp.longitude = (topTemp.longitude + bottomTemp.longitude)/2.0;
 		bottomTemp.latitude = (topTemp.latitude + bottomTemp.latitude)/2.0;
 		topTemp.elevation = (topTemp.elevation + bottomTemp.elevation)/2.0;
-		child5.createTree(level, topTemp, bottomTemp);
+		child5.createTree(statement, level, topTemp, bottomTemp);
 
 		//child6
 		topTemp = new Coordinate(t);
@@ -128,7 +172,7 @@ public class Octree {
 		topTemp.longitude = (topTemp.longitude + bottomTemp.longitude)/2.0;
 		bottomTemp.latitude = (topTemp.latitude + bottomTemp.latitude)/2.0;
 		topTemp.elevation = (topTemp.elevation + bottomTemp.elevation)/2.0;
-		child6.createTree(level, topTemp, bottomTemp);
+		child6.createTree(statement, level, topTemp, bottomTemp);
 
 		//child7
 		topTemp = new Coordinate(t);
@@ -136,7 +180,7 @@ public class Octree {
 		bottomTemp.longitude = (topTemp.longitude + bottomTemp.longitude)/2.0;
 		topTemp.latitude = (topTemp.latitude + bottomTemp.latitude)/2.0;
 		topTemp.elevation = (topTemp.elevation + bottomTemp.elevation)/2.0;
-		child7.createTree(level, topTemp, bottomTemp);
+		child7.createTree(statement, level, topTemp, bottomTemp);
 
 		//child8
 		topTemp = new Coordinate(t);
@@ -144,6 +188,6 @@ public class Octree {
 		topTemp.longitude = (topTemp.longitude + bottomTemp.longitude)/2.0;
 		topTemp.latitude = (topTemp.latitude + bottomTemp.latitude)/2.0;
 		topTemp.elevation = (topTemp.elevation + bottomTemp.elevation)/2.0;
-		child8.createTree(level, topTemp, bottomTemp);
+		child8.createTree(statement, level, topTemp, bottomTemp);
 	}
 }

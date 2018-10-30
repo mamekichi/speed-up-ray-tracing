@@ -34,15 +34,9 @@ public class Main {
 		bottom.latitude = 10000;
 		bottom.elevation = 0;
 		
+		Database database = new Database();
 		try {
-			Class.forName("org.sqlite.JDBC");
-
-			Connection con = DriverManager.getConnection("jdbc:sqlite:../database.db");
-			Statement statement = con.createStatement();
-			statement.setQueryTimeout(30);
-			
-
-			oct.createTree(statement, 4, top, bottom);
+			oct.createTree(database, 4, top, bottom);
 
 			//create DB
 			//read file test
@@ -100,7 +94,7 @@ public class Main {
 							coordinate2.latitude = nextMap.recordnum*50;
 							coordinate2.elevation = nextMap.elevation[j+1];
 							box.createBox(coordinate1, coordinate2);
-							oct.insertDB(statement, box);
+							oct.insertDB(database, box);
 							//System.out.println(box.top.elevation);
 							//System.out.println(box.bottom.elevation);
 						}
@@ -118,8 +112,8 @@ public class Main {
 			top.longitude = 0;
 			top.latitude = 0;
 			top.elevation = 2000;
-			bottom.longitude = 10000;
-			bottom.latitude = 10000;
+			bottom.longitude = 1000;
+			bottom.latitude = 1000;
 			bottom.elevation = 0;
 			List<String> list = new ArrayList<>();
 			oct.search(list, top, bottom);
@@ -128,7 +122,7 @@ public class Main {
 			System.out.println(oct.bottom.elevation);
 			System.out.println(oct.child4.bottom.elevation);
 			
-			oct.getBox(statement, list);
+			oct.getBox(database, list);
 			
 			/*
 			ResultSet results; 
@@ -140,12 +134,9 @@ public class Main {
 			}
 			*/
 			
-		}catch(ClassNotFoundException e) {
-			e.printStackTrace();
-		}catch(SQLException e) {
+		}catch(Exception e) {
 			e.printStackTrace();
 		}
-		
 
 		return;
 	}

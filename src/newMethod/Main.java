@@ -17,9 +17,7 @@ import java.io.FileReader;
 
 public class Main {
 	public static void main(String[] args) {
-		System.out.println("hello");
-
-		GlobalVariable.gId = 1;
+		System.out.println("start");
 		
 		//create Octree
 		Octree oct = new Octree();

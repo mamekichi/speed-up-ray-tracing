@@ -1,7 +1,6 @@
 package newMethod;
 
 import java.sql.ResultSet;
-import java.sql.Statement;
 import java.util.List;
 
 public class Octree {
@@ -32,7 +31,7 @@ public class Octree {
 				results = database.select(list.get(i));
 				if(results != null) {
 					while(results.next()) {
-						System.out.println(results.getString("top_tatitude"));
+						System.out.println(results.getString("top_latitude"));
 					}
 				}
 			}
@@ -75,7 +74,6 @@ public class Octree {
 		}
 	}
 
-	//範囲内にあるboxをlistにいれて返す
 	public void search(List<String> list, Coordinate t, Coordinate b) {
 		try {
 			if( (this.top.longitude <= b.longitude && t.longitude <= this.bottom.longitude) &&
@@ -105,7 +103,7 @@ public class Octree {
 			this.dbname = "db" + String.valueOf((int)this.top.longitude) + String.valueOf((int)this.top.latitude) + String.valueOf((int)this.top.elevation);
 			
 			try {
-				String value = "id,bottom_longitude,top_longitude,bottom_latitude,top_tatitude,bottom_elevation,top_elevation";
+				String value = "id,bottom_longitude,top_longitude,bottom_latitude,top_latitude,bottom_elevation,top_elevation";
 				database.createTable(this.dbname, value);
 			}catch(Exception e) {
 				//System.out.println(e);

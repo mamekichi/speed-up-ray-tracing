@@ -44,10 +44,10 @@ public class Database {
 		}
 	}
 	
-	public ResultSet select(String dbname) {
+	public ResultSet select(String dbname, String value) {
 		ResultSet resultset = null;
 		try {
-			resultset = statement.executeQuery("SELECT * FROM "+dbname+";");
+			resultset = statement.executeQuery("SELECT * FROM " +dbname+ " WHERE " +value+ ";");
 		}catch(Exception e) {
 			System.out.println("in select");
 			System.out.println(e);

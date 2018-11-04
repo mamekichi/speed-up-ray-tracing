@@ -107,20 +107,32 @@ public class Main {
 			}
 
 			//search
-			top.longitude = 0;
-			top.latitude = 0;
-			top.elevation = 2000;
-			bottom.longitude = 1000;
-			bottom.latitude = 1000;
-			bottom.elevation = 0;
+			top.longitude = 9500;
+			top.latitude = 9500;
+			top.elevation = 1600;
+			bottom.longitude = 10000;
+			bottom.latitude = 10000;
+			bottom.elevation = 1500;
 			List<String> list = new ArrayList<>();
 			oct.search(list, top, bottom);
 			System.out.println(list);
-		
 			System.out.println(oct.bottom.elevation);
 			System.out.println(oct.child4.bottom.elevation);
 			
-			oct.getBox(database, list);
+			Box searchBox = new Box();
+			searchBox.createBox(top, bottom);
+			int i;
+			String dbname = "";
+			for(i = 0; i < list.size();i++) {
+				dbname += list.get(i) + ",";	
+			}
+			long startTime = System.currentTimeMillis();
+			int temp;
+			for(temp = 0; temp < 1000; temp++) {
+				oct.getBox(database, dbname, searchBox);
+			}
+			long endTime = System.currentTimeMillis();
+			System.out.println(endTime-startTime);
 			
 			/*
 			ResultSet results; 

@@ -20,21 +20,27 @@ public class Octree {
 	String dbname;
 	int unum;
 	
-	public void getBox(Database database, List<String> list) {
+	public void getBox(Database database, String dbname, Box box) {
 		try {
 			int i;
 			ResultSet results = null;
-			for(i = 0; i < list.size();i++) {
+			String value ="";
 			
-				System.out.println(list.get(i));
+			value += "top_latitude > " + String.valueOf(box.top.latitude) + " AND " +
+					"top_longitude > " + String.valueOf(box.top.longitude) + " AND " +
+					"top_elevation < " + String.valueOf(box.top.elevation) + " AND " + 
+					"bottom_latitude < " + String.valueOf(box.bottom.latitude) + " AND " +
+					"bottom_longitude < " + String.valueOf(box.bottom.longitude) + " AND " +
+					"bottom_elevation > " + String.valueOf(box.bottom.elevation); 
+			
+				//System.out.println(list.get(i));
 				//results = statement.executeQuery("select * from "+list.get(i)+";");
-				results = database.select(list.get(i));
+				results = database.select(dbname, value);
 				if(results != null) {
 					while(results.next()) {
-						System.out.println(results.getString("top_latitude"));
+						//System.out.println(results.getString("top_latitude"));
 					}
 				}
-			}
 		}catch(Exception e) {
 			System.out.println(e);
 		}

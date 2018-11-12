@@ -16,7 +16,7 @@ public class Database {
 		try {
 			Class.forName("org.sqlite.JDBC");
 			
-			this.connection = DriverManager.getConnection("jdbc:sqlite:C:/temp/test.db");
+			this.connection = DriverManager.getConnection("jdbc:sqlite:src/DB/newMethod.db");
 			this.statement = connection.createStatement();
 			this.statement.setQueryTimeout(30);
 		}catch(Exception e) {
@@ -47,10 +47,12 @@ public class Database {
 	public ResultSet select(String dbname, String value) {
 		ResultSet resultset = null;
 		try {
-			resultset = statement.executeQuery("SELECT * FROM " +dbname+ " WHERE " +value+ ";");
+			//System.out.println("SELECT * FROM " +dbname+ " WHERE " +value+ ";");
+			resultset = statement.executeQuery("SELECT * FROM (SELECT * FROM " +dbname+ ") WHERE " +value+ ";");
+			//resultset = statement.executeQuery("SELECT * FROM " +dbname+ " WHERE " +value+ ";");
 		}catch(Exception e) {
-			System.out.println("in select");
-			System.out.println(e);
+			//System.out.println("in select");
+			//System.out.println(e);
 		}
 		return resultset;
 	}

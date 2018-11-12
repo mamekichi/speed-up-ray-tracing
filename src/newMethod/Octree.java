@@ -22,7 +22,6 @@ public class Octree {
 	
 	public void getBox(Database database, String dbname, Box box) {
 		try {
-			int i;
 			ResultSet results = null;
 			String value ="";
 			

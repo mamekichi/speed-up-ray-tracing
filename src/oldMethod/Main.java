@@ -8,6 +8,8 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -100,9 +102,9 @@ public class Main {
 								String.valueOf(box.top.elevation);
 						//insert into table
 						try {
-							statement.executeUpdate("INSERT INTO map VALUES("+queValue+");");
+							//statement.executeUpdate("INSERT INTO map VALUES("+queValue+");");
 						}catch(Exception e) {
-							System.out.println(e);
+							//System.out.println(e);
 						}
 						id++;
 						//System.out.println(box.top.elevation);
@@ -125,17 +127,42 @@ public class Main {
 		//select
 		try {
 			int temp;
-			long startTime = System.currentTimeMillis();
-			for(temp = 0;temp<1000;temp++) {
-				resultset = statement.executeQuery("SELECT * FROM map where top_elevation < 1600 AND bottom_elevation > 1500 AND top_latitude > 9500 AND bottom_latitude < 10000 AND top_longitude > 9500 AND bottom_longitude < 10000;");
-				if(resultset != null) {
-					while(resultset.next()) {
-						//System.out.println(resultset.getString("top_elevation"));
+			Coordinate top = new Coordinate();
+			Coordinate bottom = new Coordinate();
+			top.longitude = 9500;
+			top.latitude = 9500;
+			top.elevation = 1600;
+			bottom.longitude = 10000;
+			bottom.latitude = 10000;
+			bottom.elevation = 1500;
+			
+			Box box = new Box();
+			box.createBox(top, bottom);
+			int temp2;
+			double ave = 0.0;
+			for(temp2 = 0; temp2 < 1; temp2++) {
+				long startTime = System.currentTimeMillis();
+				for(temp = 0;temp<100;temp++) {
+					String value ="";
+				
+					value += "top_latitude > " + String.valueOf(box.top.latitude) + " AND " +
+							"top_longitude > " + String.valueOf(box.top.longitude) + " AND " +
+							"top_elevation < " + String.valueOf(box.top.elevation) + " AND " + 
+							"bottom_latitude < " + String.valueOf(box.bottom.latitude) + " AND " +
+							"bottom_longitude < " + String.valueOf(box.bottom.longitude) + " AND " +
+							"bottom_elevation > " + String.valueOf(box.bottom.elevation); 
+					resultset = statement.executeQuery("SELECT * FROM map where "+value+";");
+					if(resultset != null) {
+						while(resultset.next()) {
+							//System.out.println(resultset.getString("top_elevation"));
+						}
 					}
 				}
+				long endTime = System.currentTimeMillis();
+				ave += endTime-startTime;
 			}
-			long endTime = System.currentTimeMillis();
-			System.out.println(endTime-startTime);
+			ave /= 1;
+			System.out.println(ave);
 		}catch(Exception e) {
 			System.out.println(e);
 		}

@@ -20,9 +20,9 @@ public class Octree {
 	String dbname;
 	int unum;
 	
-	public void getBox(Database database, String dbname, Box box) {
+	public ResultSet getBox(Database database, String dbname, Box box) {
+		ResultSet resultset = null;
 		try {
-			ResultSet results = null;
 			String value ="";
 			
 			value += "top_latitude > " + String.valueOf(box.top.latitude) + " AND " +
@@ -32,17 +32,11 @@ public class Octree {
 					"bottom_longitude < " + String.valueOf(box.bottom.longitude) + " AND " +
 					"bottom_elevation > " + String.valueOf(box.bottom.elevation); 
 			
-				//System.out.println(list.get(i));
-				//results = statement.executeQuery("select * from "+list.get(i)+";");
-				results = database.select(dbname, value);
-				if(results != null) {
-					while(results.next()) {
-						//System.out.println(results.getString("top_latitude"));
-					}
-				}
+				resultset = database.select(dbname, value);
 		}catch(Exception e) {
 			System.out.println(e);
 		}
+		return resultset;
 	}
 
 	public void insertDB(Database database, Box box) {
@@ -79,19 +73,19 @@ public class Octree {
 		}
 	}
 
-	public void search(List<String> list, Coordinate t, Coordinate b) {
+	public void search(List<String> list, Box box) {
 		try {
-			if( (this.top.longitude <= b.longitude && t.longitude <= this.bottom.longitude) &&
-				(this.top.latitude <= b.latitude && t.latitude <= this.bottom.latitude) &&
-				(this.top.elevation >= b.elevation && t.elevation >= this.bottom.elevation) ) {
-				this.child1.search(list, t, b);
-				this.child2.search(list, t, b);
-				this.child3.search(list, t, b);
-				this.child4.search(list, t, b);
-				this.child5.search(list, t, b);
-				this.child6.search(list, t, b);
-				this.child7.search(list, t, b);
-				this.child8.search(list, t, b);
+			if( (this.top.longitude <= box.bottom.longitude && box.top.longitude <= this.bottom.longitude) &&
+				(this.top.latitude <= box.bottom.latitude && box.top.latitude <= this.bottom.latitude) &&
+				(this.top.elevation >= box.bottom.elevation && box.top.elevation >= this.bottom.elevation) ) {
+				this.child1.search(list, box);
+				this.child2.search(list, box);
+				this.child3.search(list, box);
+				this.child4.search(list, box);
+				this.child5.search(list, box);
+				this.child6.search(list, box);
+				this.child7.search(list, box);
+				this.child8.search(list, box);
 			}
 		}catch(Exception e){
 			list.add(this.dbname);

@@ -1,6 +1,7 @@
 package newMethod;
 
 
+import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,39 +24,52 @@ public class Main {
 		
 		Polygon polygon = new Polygon();
 		Database database = new Database();
+		
+		//create oct tree
+		oct.createTree(database, 4, top, bottom);
+		
+		//create polygon and insert polygon into database
+		polygon.create(oct, database);
+		
+		//search
 		try {
-			oct.createTree(database, 4, top, bottom);
-
-			//create DB
-			//read file test
-			polygon.create(oct, database);
-
-			//search
+			//set search range
+			Box searchBox = new Box();
 			top.longitude = 9500;
 			top.latitude = 9500;
 			top.elevation = 1600;
 			bottom.longitude = 10000;
 			bottom.latitude = 10000;
 			bottom.elevation = 1500;
-			List<String> list = new ArrayList<>();
-			oct.search(list, top, bottom);
-			System.out.println(list);
-			
-			Box searchBox = new Box();
 			searchBox.createBox(top, bottom);
+			
+			//search database table in oct tree
+			List<String> list = new ArrayList<>();
+			oct.search(list, searchBox);
+			System.out.println(list);	//oct list
+			
+			//link database name
 			int i;
 			String dbname = "";
 			for(i = 0; i < list.size();i++) {
 				dbname += list.get(i) + ",";	
 			}
 			dbname = dbname.substring(0, dbname.length()-1);
+			
+			//search polygon in database table
 			double ave = 0.0;
 			int temp2;
+			ResultSet resultset = null;
 			for(temp2 = 0; temp2 < 1; temp2++) {
 				long startTime = System.currentTimeMillis();
 				int temp;
 					for(temp = 0; temp < 100; temp++) {
-						oct.getBox(database, dbname, searchBox);
+						resultset = oct.getBox(database, dbname, searchBox);
+						if(resultset != null) {
+							while(resultset.next()) {
+								//System.out.println(resultset.getString("top_latitude"));
+							}
+						}
 					}
 				long endTime = System.currentTimeMillis();
 				ave += endTime-startTime;
@@ -63,15 +77,6 @@ public class Main {
 			ave /= 1;
 			System.out.println(ave);
 			
-			/*
-			ResultSet results; 
-			//statement.executeQuery("create virtual table demo_index USING rtree(id,minX,maxX,minY,maxY);");
-			statement.executeUpdate("INSERT INTO demo_index VALUES(5,-80.7749,-80.7747,35.3776,35.3778);");
-			results = statement.executeQuery("SELECT * FROM demo_index WHERE id = 1;");
-			while(results.next()) {
-				System.out.println(results.getString("minX"));
-			}
-			*/
 			
 		}catch(Exception e) {
 			e.printStackTrace();

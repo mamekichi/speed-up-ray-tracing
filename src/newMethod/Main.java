@@ -56,6 +56,7 @@ public class Main {
 			}
 			dbname = dbname.substring(0, dbname.length()-1);
 			
+			
 			//search polygon in database table
 			double ave = 0.0;
 			int temp2;

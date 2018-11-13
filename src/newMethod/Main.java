@@ -15,6 +15,7 @@ public class Main {
 		Coordinate top = new Coordinate();
 		Coordinate bottom = new Coordinate();
 
+		//set octree range
 		top.longitude = 0;
 		top.latitude = 0;
 		top.elevation = 2000;
@@ -26,10 +27,12 @@ public class Main {
 		Database database = new Database();
 		
 		//create oct tree
-		oct.createTree(database, 4, top, bottom);
+		//oct.createTree(database, 4, top, bottom);
+		Box rangeBox = new Box();
+		rangeBox.createBox(top, bottom);
 		
 		//create polygon and insert polygon into database
-		polygon.create(oct, database);
+		polygon.create(oct, database, rangeBox);
 		
 		//search
 		try {
@@ -68,7 +71,7 @@ public class Main {
 						resultset = oct.getBox(database, dbname, searchBox);
 						if(resultset != null) {
 							while(resultset.next()) {
-								//System.out.println(resultset.getString("top_latitude"));
+								System.out.println(resultset.getString("top_elevation"));
 							}
 						}
 					}

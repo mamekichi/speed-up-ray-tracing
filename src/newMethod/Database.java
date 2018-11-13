@@ -36,11 +36,13 @@ public class Database {
 	
 	public void insert(String dbname, String value) {
 		try {
+			//System.out.println(value);
 			statement.executeUpdate("INSERT INTO "+dbname+" VALUES("+value+");");
 			this.id++;
 		}catch(Exception e) {
-			System.out.println("in insert");
-			System.out.println(e);
+			this.id++;
+			//System.out.println("in insert");
+			//System.out.println(e);
 		}
 	}
 	

@@ -13,7 +13,7 @@ public class Polygon {
 		
 	}
 	
-	public void create(Octree oct, Database database) {
+	public void create(Octree oct, Database database, Box rangeBox) {
 		try {
 			File file = new File("src/Jmap/6544/654450.MEM");
 	
@@ -44,10 +44,11 @@ public class Polygon {
 				nowbr.readLine();
 				nextbr.readLine();
 				nextbr.readLine();
-				
+				int countnum = 0;
 				while(((nowLine = nowbr.readLine()) != null) && ((nextLine = nextbr.readLine()) != null)) {
 					//read file each line
-					System.out.println("---");
+					System.out.println("---" + countnum + "---");
+					countnum++;
 					nowMap.meshcode = Integer.parseInt(nowLine.substring(0, 6));
 					nextMap.meshcode = Integer.parseInt(nextLine.substring(0, 6));
 					nowMap.recordnum = Integer.parseInt(nowLine.substring(6,9));
@@ -73,7 +74,13 @@ public class Polygon {
 						coordinate2.elevation = nextMap.elevation[i+1];
 						
 						box.createBox(coordinate1, coordinate2);
-						oct.insertDB(database, box);
+						
+						//ver.1
+						//oct.insertDB(database, box);
+						
+						//ver.2
+						oct.create(database, rangeBox, box, 4);
+						
 						//System.out.println(box.top.elevation);
 						//System.out.println(box.bottom.elevation);
 					}

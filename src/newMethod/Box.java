@@ -1,8 +1,8 @@
 package newMethod;
 
 public class Box {
-	Coordinate top;
-	Coordinate bottom;
+	public Coordinate top;
+	public Coordinate bottom;
 	
 	Box(){
 		top = new Coordinate();

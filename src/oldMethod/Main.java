@@ -154,7 +154,7 @@ public class Main {
 					resultset = statement.executeQuery("SELECT * FROM map where "+value+";");
 					if(resultset != null) {
 						while(resultset.next()) {
-							//System.out.println(resultset.getString("top_elevation"));
+							System.out.println(resultset.getString("top_elevation"));
 						}
 					}
 				}

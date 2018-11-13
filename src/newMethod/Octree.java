@@ -3,8 +3,9 @@ package newMethod;
 import java.sql.ResultSet;
 import java.util.List;
 
-public class Octree {
 
+public class Octree {
+	
 	Coordinate top;
 	Coordinate bottom;
 
@@ -19,6 +20,160 @@ public class Octree {
 
 	String dbname;
 	int unum;
+	
+	public Octree() {
+		this.dbname = "";
+		this.child1 = null;
+		this.child2 = null;
+		this.child3 = null;
+		this.child4 = null;
+		this.child5 = null;
+		this.child6 = null;
+		this.child7 = null;
+		this.child8 = null;
+	}
+	
+	public void create(Database database, Box rangeBox, Box polygonBox, int level) {
+		
+		this.top = new Coordinate(rangeBox.top);
+		this.bottom = new Coordinate(rangeBox.bottom);
+
+		//if this is leaf
+		if(level == 0) {
+			//if table don't exist
+			if(this.dbname.equals("")) {
+				this.dbname = "db" + String.valueOf((int)this.top.longitude) + String.valueOf((int)this.top.latitude) + String.valueOf((int)this.top.elevation);
+			
+				try {
+					String value = "id,bottom_longitude,top_longitude,bottom_latitude,top_latitude,bottom_elevation,top_elevation";
+					database.createTable(this.dbname, value);
+				}catch(Exception e) {
+					//System.out.println(e);
+				}
+			}
+			
+			//insert
+			try {	
+				String queValue = String.valueOf(database.id) + ","+String.valueOf(polygonBox.top.longitude) + ","+
+						String.valueOf(polygonBox.bottom.longitude) + ","+
+						String.valueOf(polygonBox.top.latitude) + ","+
+						String.valueOf(polygonBox.bottom.latitude) + ","+
+						String.valueOf(polygonBox.bottom.elevation) + ","+
+						String.valueOf(polygonBox.top.elevation);				
+				database.insert(this.dbname, queValue);
+			}catch(Exception e) {
+				System.out.println(e);
+			}
+			
+			
+			this.unum = (int)this.top.longitude;
+			return;
+		}
+		//if not leaf
+		level--;
+		Coordinate topTemp;
+		Coordinate bottomTemp;
+		Box box = new Box();
+		topTemp = new Coordinate(rangeBox.top);
+		bottomTemp = new Coordinate(rangeBox.bottom);
+		
+		//distribute polygon to box that top join in
+		if(polygonBox.top.longitude > this.top.longitude && polygonBox.top.longitude <= this.bottom.longitude/2.0) {
+			if(polygonBox.top.latitude > this.top.latitude && polygonBox.top.latitude <= this.bottom.latitude/2.0) {
+				if(polygonBox.top.elevation <= this.top.elevation && polygonBox.top.elevation > this.top.elevation/2.0) {
+					//child1
+					if(child1 == null) {
+						child1 = new Octree();
+					}
+					bottomTemp.longitude = (topTemp.longitude + bottomTemp.longitude)/2.0;
+					bottomTemp.latitude = (topTemp.latitude + bottomTemp.latitude)/2.0;
+					bottomTemp.elevation = (topTemp.elevation + bottomTemp.elevation)/2.0;
+					box.createBox(topTemp, bottomTemp);
+					child1.create(database, box, polygonBox, level);
+					
+				}else if(polygonBox.top.elevation <= this.top.elevation/2.0 && polygonBox.top.elevation > this.bottom.elevation) {
+					//child5
+					if(child5 == null) {
+						child5 = new Octree();
+					}
+					bottomTemp.longitude = (topTemp.longitude + bottomTemp.longitude)/2.0;
+					bottomTemp.latitude = (topTemp.latitude + bottomTemp.latitude)/2.0;
+					topTemp.elevation = (topTemp.elevation + bottomTemp.elevation)/2.0;
+					box.createBox(topTemp, bottomTemp);
+					child5.create(database, box, polygonBox, level);
+				}
+			}else if(polygonBox.top.latitude > this.bottom.latitude/2.0 && polygonBox.top.latitude <= this.bottom.latitude) {
+				if(polygonBox.top.elevation <= this.top.elevation && polygonBox.top.elevation > this.top.elevation/2.0) {
+					//child3	
+					if(child3 == null) {
+						child3 = new Octree();
+					}
+					topTemp.latitude = (topTemp.latitude + bottomTemp.latitude)/2.0;
+					bottomTemp.longitude = (topTemp.longitude + bottomTemp.longitude)/2.0;
+					bottomTemp.elevation = (topTemp.elevation + bottomTemp.elevation)/2.0;
+					box.createBox(topTemp, bottomTemp);
+					child3.create(database, box, polygonBox, level);
+					
+				}else if(polygonBox.top.elevation <= this.top.elevation/2.0 && polygonBox.top.elevation > this.bottom.elevation) {
+					//child7
+					if(child7 == null) {
+						child7 = new Octree();
+					}
+					bottomTemp.longitude = (topTemp.longitude + bottomTemp.longitude)/2.0;
+					topTemp.latitude = (topTemp.latitude + bottomTemp.latitude)/2.0;
+					topTemp.elevation = (topTemp.elevation + bottomTemp.elevation)/2.0;
+					box.createBox(topTemp, bottomTemp);
+					child7.create(database, box, polygonBox, level);
+				}
+			}
+		}else if(polygonBox.top.longitude > this.bottom.longitude/2.0 && polygonBox.top.longitude <= this.bottom.longitude) {
+			if(polygonBox.top.latitude > this.top.latitude && polygonBox.top.latitude <= this.bottom.latitude/2.0) {
+				if(polygonBox.top.elevation <= this.top.elevation && polygonBox.top.elevation > this.top.elevation/2.0) {
+					//child2
+					if(child2 == null) {
+						child2 = new Octree();
+					}
+					topTemp.longitude = (topTemp.longitude + bottomTemp.longitude)/2.0;
+					bottomTemp.latitude = (topTemp.latitude + bottomTemp.latitude)/2.0;
+					bottomTemp.elevation = (topTemp.elevation + bottomTemp.elevation)/2.0;
+					box.createBox(topTemp, bottomTemp);
+					child2.create(database, box, polygonBox, level);
+				}else if(polygonBox.top.elevation <= this.top.elevation/2.0 && polygonBox.top.elevation > this.bottom.elevation) {
+					//child6
+					if(child6 == null) {
+						child6 = new Octree();
+					}
+					topTemp.longitude = (topTemp.longitude + bottomTemp.longitude)/2.0;
+					bottomTemp.latitude = (topTemp.latitude + bottomTemp.latitude)/2.0;
+					topTemp.elevation = (topTemp.elevation + bottomTemp.elevation)/2.0;
+					box.createBox(topTemp, bottomTemp);
+					child6.create(database, box, polygonBox, level);
+				}
+			}else if(polygonBox.top.latitude > this.bottom.latitude/2.0 && polygonBox.top.latitude <= this.bottom.latitude) {
+				if(polygonBox.top.elevation <= this.top.elevation && polygonBox.top.elevation > this.top.elevation/2.0) {
+					//child4
+					if(child4 == null) {
+						child4 = new Octree();
+					}
+					topTemp.longitude = (topTemp.longitude + bottomTemp.longitude)/2.0;
+					topTemp.latitude = (topTemp.latitude + bottomTemp.latitude)/2.0;
+					bottomTemp.elevation = (topTemp.elevation + bottomTemp.elevation)/2.0;
+					box.createBox(topTemp, bottomTemp);
+					child4.create(database, box, polygonBox, level);
+				}else if(polygonBox.top.elevation <= this.top.elevation/2.0 && polygonBox.top.elevation > this.bottom.elevation) {
+					//child8
+					if(child8 == null) {
+						child8 = new Octree();
+					}
+					topTemp.longitude = (topTemp.longitude + bottomTemp.longitude)/2.0;
+					topTemp.latitude = (topTemp.latitude + bottomTemp.latitude)/2.0;
+					topTemp.elevation = (topTemp.elevation + bottomTemp.elevation)/2.0;
+					box.createBox(topTemp, bottomTemp);
+					child8.create(database, box, polygonBox, level);
+				}
+			}
+		}
+	}
 	
 	public ResultSet getBox(Database database, String dbname, Box box) {
 		ResultSet resultset = null;
@@ -73,19 +228,46 @@ public class Octree {
 		}
 	}
 
-	public void search(List<String> list, Box box) {
+	public void search(List<String> list, Box polygonBox) {
 		try {
-			if( (this.top.longitude <= box.bottom.longitude && box.top.longitude <= this.bottom.longitude) &&
-				(this.top.latitude <= box.bottom.latitude && box.top.latitude <= this.bottom.latitude) &&
-				(this.top.elevation >= box.bottom.elevation && box.top.elevation >= this.bottom.elevation) ) {
-				this.child1.search(list, box);
-				this.child2.search(list, box);
-				this.child3.search(list, box);
-				this.child4.search(list, box);
-				this.child5.search(list, box);
-				this.child6.search(list, box);
-				this.child7.search(list, box);
-				this.child8.search(list, box);
+			//distribute polygon to box that top join in
+			if(polygonBox.top.longitude > this.top.longitude && polygonBox.top.longitude <= this.bottom.longitude/2.0) {
+				if(polygonBox.top.latitude > this.top.latitude && polygonBox.top.latitude <= this.bottom.latitude/2.0) {
+					if(polygonBox.top.elevation <= this.top.elevation && polygonBox.top.elevation > this.top.elevation/2.0) {
+						//child1
+						child1.search(list ,polygonBox);
+						
+					}else if(polygonBox.top.elevation <= this.top.elevation/2.0 && polygonBox.top.elevation > this.bottom.elevation) {
+						//child5
+						child5.search(list ,polygonBox);
+					}
+				}else if(polygonBox.top.latitude > this.bottom.latitude/2.0 && polygonBox.top.latitude <= this.bottom.latitude) {
+					if(polygonBox.top.elevation <= this.top.elevation && polygonBox.top.elevation > this.top.elevation/2.0) {
+						//child3	
+						child3.search(list ,polygonBox);
+					}else if(polygonBox.top.elevation <= this.top.elevation/2.0 && polygonBox.top.elevation > this.bottom.elevation) {
+						//child7
+						child7.search(list ,polygonBox);
+					}
+				}
+			}else if(polygonBox.top.longitude > this.bottom.longitude/2.0 && polygonBox.top.longitude <= this.bottom.longitude) {
+				if(polygonBox.top.latitude > this.top.latitude && polygonBox.top.latitude <= this.bottom.latitude/2.0) {
+					if(polygonBox.top.elevation <= this.top.elevation && polygonBox.top.elevation > this.top.elevation/2.0) {
+						//child2
+						child2.search(list ,polygonBox);
+					}else if(polygonBox.top.elevation <= this.top.elevation/2.0 && polygonBox.top.elevation > this.bottom.elevation) {
+						//child6
+						child6.search(list ,polygonBox);
+					}
+				}else if(polygonBox.top.latitude > this.bottom.latitude/2.0 && polygonBox.top.latitude <= this.bottom.latitude) {
+					if(polygonBox.top.elevation <= this.top.elevation && polygonBox.top.elevation > this.top.elevation/2.0) {
+						//child4
+						child4.search(list ,polygonBox);
+					}else if(polygonBox.top.elevation <= this.top.elevation/2.0 && polygonBox.top.elevation > this.bottom.elevation) {
+						//child8
+						child8.search(list ,polygonBox);
+					}
+				}
 			}
 		}catch(Exception e){
 			list.add(this.dbname);

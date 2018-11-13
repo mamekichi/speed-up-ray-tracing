@@ -1,19 +1,8 @@
 package newMethod;
 
-import java.io.IOException;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
+
 import java.util.ArrayList;
 import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-//file
-import java.io.*;
-import java.io.File;
-import java.io.FileReader;
 
 public class Main {
 	public static void main(String[] args) {

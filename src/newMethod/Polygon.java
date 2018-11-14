@@ -47,8 +47,6 @@ public class Polygon {
 				int countnum = 0;
 				while(((nowLine = nowbr.readLine()) != null) && ((nextLine = nextbr.readLine()) != null)) {
 					//read file each line
-					System.out.println("---" + countnum + "---");
-					countnum++;
 					nowMap.meshcode = Integer.parseInt(nowLine.substring(0, 6));
 					nextMap.meshcode = Integer.parseInt(nextLine.substring(0, 6));
 					nowMap.recordnum = Integer.parseInt(nowLine.substring(6,9));
@@ -57,6 +55,9 @@ public class Polygon {
 					nextElevationpart = nextLine.substring(9, 1009);
 					nowElevation = Pattern.compile("[\\s\\S]{1,5}").matcher(nowElevationpart);
 					nextElevation = Pattern.compile("[\\s\\S]{1,5}").matcher(nextElevationpart);
+					
+					System.out.println("---" + countnum + "---");
+					countnum++;
 					
 					i = 0;
 					while(nowElevation.find() && nextElevation.find()) {

@@ -2,8 +2,10 @@ package CoordinateTransformation;
 
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -14,6 +16,9 @@ public class Main {
 		
 		Coordinate coordinate = new Coordinate();
 		Transformation trans = new Transformation();
+		int dgree = 0;
+		int minute = 0;
+		double second = 0.0;
 		
 		String dirname = "src/Jmap/6544/";
 		
@@ -22,28 +27,37 @@ public class Main {
 			String filenamelist[] = filelist.list();
 			File file = null;
 			for(i = 0; i < filenamelist.length; i++) {
-				if(!filenamelist[i].equals("._.DS_Store") && !filenamelist[i].equals(".DS_Store")) {
+				if(!filenamelist[i].equals("654400.MEM")&&filenamelist[i].length() == 10) {
 					
-					if(filenamelist[i].length() != 10){ 
-						filenamelist[i] = filenamelist[i].substring(2,filenamelist[i].length());
-					}
 					file = new File(dirname + filenamelist[i]);
-	
+					
 					if(file.exists()) {
-						FileReader nowFilereader = new FileReader(file);
-						BufferedReader nowbr = new BufferedReader(nowFilereader);
-					
+						FileInputStream fis = new FileInputStream(file);
+						InputStreamReader isr = new InputStreamReader(fis, "SJIS");
+						BufferedReader nowbr = new BufferedReader(isr);
 						String nowLine;
-				
-						//except header and set nextLine
+						
 						nowLine = nowbr.readLine();
-						nowLine = nowbr.readLine();
-						System.out.println(filenamelist[i]);
-						System.out.println(nowLine.substring(887, 894));
-						coordinate.latitude = Double.parseDouble(nowLine.substring(887, 894));
-						coordinate.longitude = Double.parseDouble(nowLine.substring(895, 903));
+						
+						coordinate.latitude = Double.parseDouble(nowLine.substring(710, 717));
+						coordinate.longitude = Double.parseDouble(nowLine.substring(718, 725));
+						
+						//optimisation
+						coordinate.latitude /= 10.0;
+						coordinate.longitude += 10000000.0;
+						coordinate.longitude /= 10.0;
 						coordinate.elevation = 0.0;
-					
+						
+						dgree = (int)(coordinate.latitude / 10000.0);
+						minute = (int)((coordinate.latitude - dgree*10000.0)/100.0);
+						second = (coordinate.latitude - dgree*10000.0 - minute*100.0);
+						coordinate.latitude = dgree + (minute*60 + second)/3600;
+						
+						dgree = (int)(coordinate.longitude / 10000.0);
+						minute = (int)((coordinate.longitude - dgree*10000.0)/100.0);
+						second = (coordinate.longitude - dgree*10000.0 - minute*100.0);
+						coordinate.longitude = dgree + (minute*60 + second)/3600;
+						
 						String nowElevationpart;
 						Matcher nowElevation;
 					
@@ -58,26 +72,37 @@ public class Main {
 							nowElevationpart = nowLine.substring(9, 1009);
 							nowElevation = Pattern.compile("[\\s\\S]{1,5}").matcher(nowElevationpart);
 						
+							//read elevation from file 
 							int j = 0;
 							while(nowElevation.find()) {
 								elevation[j] = Integer.parseInt(nowElevation.group());
 								j++;
-							}	
-					
+							}
+							
+							//tranform coordination and write new csv file
+							System.out.println(filenamelist[i]);
 							for(j = 0; j < 199; j++) {
+								
+								//transform coordination
+								
 								coordinate.elevation = elevation[j];
 								trans.toGeocentric(coordinate);
+								
+								//write new file
+								System.out.println("---");
+								System.out.println(coordinate.x);
+								System.out.println(coordinate.y);
+								System.out.println(coordinate.z);
+								System.out.println(coordinate.latitude);
+								System.out.println(coordinate.longitude);
+								System.out.println(coordinate.elevation);
+								
 							
-								//System.out.println(coordinate.x);
-								//System.out.println(coordinate.y);
-								//System.out.println(coordinate.z);
-								//System.out.println("");
-							
-								coordinate.longitude += 0.25;
+								coordinate.longitude += 0.0000694;
 							}
-							coordinate.latitude += 0.5;
+							coordinate.latitude += 0.000138;
 						}		
-						nowFilereader.close();
+						//nowFilereader.close();
 					}else {
 						System.out.println("No file");
 					}

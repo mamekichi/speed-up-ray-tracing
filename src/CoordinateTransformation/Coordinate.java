@@ -8,4 +8,5 @@ public class Coordinate {
 	double longitude;
 	double latitude;
 	double elevation;
+	
 }

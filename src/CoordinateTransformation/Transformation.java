@@ -18,5 +18,18 @@ public class Transformation {
 		coordinate.z = (N * (1 - constant.powE) + coordinate.elevation) * Math.sin(radLat);
 		
 	}
+	
+	public double LLtoDecimal(double l) {
+		int dgree = 0;
+		int minute = 0;
+		double second = 0.0;
+		
+		dgree = (int)(l / 10000.0);
+		minute = (int)((l - dgree*10000.0)/100.0);
+		second = (l - dgree*10000.0 - minute*100.0);
+		l = dgree + (minute*60 + second)/3600;
+		
+		return l;
+	}
 
 }
